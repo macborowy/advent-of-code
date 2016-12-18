@@ -44,7 +44,7 @@ defmodule InstructionTest do
 
   describe "to_sequence" do
     test "should convert string containing instructions to password sequence", %{instructions: instructions} do
-      assert instructions |> Instruction.to_sequence("5", :rectangle) == "5287"
+      assert instructions |> Instruction.to_sequence(:rectangle) == "5287"
     end
   end
 end

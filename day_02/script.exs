@@ -1,9 +1,9 @@
 defmodule Keypad do
-  def to_code(instructions, shape), do: instructions |> Instruction.to_sequence("5", shape)
+  def to_code(instructions, shape), do: instructions |> Instruction.to_sequence(shape)
 end
 
 defmodule Instruction do
-  def to_sequence(instructions, from, shape) do
+  def to_sequence(instructions, shape, from \\ "5") do
     instructions
     |> parse
     |> find_sequence(from, shape)
