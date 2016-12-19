@@ -1,98 +1,61 @@
-defmodule Script do
-  def get_sum_of_sectors(input) do
+defmodule Exercise do
+  def sum_of_sectors(input) do
     input
     |> parse
     |> filter_real_rooms
-    |> Enum.reduce(0, fn (encrypted_name, acc) -> encrypted_name |> Room.sector |> Kernel.+(acc) end)
+    |> Enum.reduce(0, &reduce_rooms/2)
   end
 
-  def get_real_room_names(input) do
+  def real_room_names(input) do
     input
     |> parse
     |> filter_real_rooms
-    |> Enum.map(&Room.encrypted_name/1)
-    |> Enum.map(&Room.real_name/1)
+    |> Enum.map(fn cipher -> {Room.real_name(cipher), Room.sector(cipher)} end)
   end
 
-  defp parse(input), do: input |> String.trim |> String.split("\n")
+  defp parse(input), do: input |> String.trim_trailing |> String.split("\n")
 
-  defp filter_real_rooms(list), do: list |> Enum.filter(&Room.is_real?/1)
+  defp filter_real_rooms(list), do: list |> Enum.filter(&Cipher.is_valid?/1)
+
+  defp reduce_rooms(real_room, acc), do: real_room |> Room.sector |> Kernel.+(acc)
 end
 
 defmodule Room do
-  def real_name(encrypted_name) do
-    sector = encrypted_name |> sector
+  def sector(cipher), do: cipher |> parse |> Enum.at(1) |> String.to_integer
 
-    real_name =
-      encrypted_name
-      |> String.split_at(-3)
-      |> elem(0)
-      |> String.replace("-", " ")
-      |> String.trim
-      |> String.graphemes
-      |> Enum.map(fn letter -> Shift.forward(letter, sector) end)
-      |> List.to_string
+  def real_name(cipher) do
+    [cipher_name, sector] = cipher |> parse
+    sector = sector |> String.to_integer
 
-    {real_name, sector}
+    cipher_name
+    |> String.replace("-", " ")
+    |> String.trim
+    |> String.graphemes
+    |> Enum.map(&(Shift.forward(&1, sector)))
+    |> List.to_string
   end
 
-  def is_real?(encrypted_name) do
-    checksum = encrypted_name |> checksum
-    cipher = encrypted_name |> Cipher.create
-
-    cipher == checksum
-  end
-
-  def sector(encrypted_name) do
-    Regex.run(~r/\-(\d+)/, encrypted_name, capture: :all_but_first)
-    |> List.first
-    |> String.to_integer
-  end
-
-  def encrypted_name(name_with_checksum), do: name_with_checksum |> String.split_at(-7) |> elem(0)
-
-  defp checksum(input), do: Regex.run(~r/\[(\w+)\]/, input, capture: :all_but_first) |> List.first
+  defp parse(cipher), do: Regex.run(~r/([\w\-]+)-(\d+)/, cipher) |> tl
 end
 
 defmodule Cipher do
-  def create(input) do
-    input
-    |> parse
-    |> get_most_common_letters
-    |> to_cipher
-  end
+  def is_valid?(cipher) do
+    [text, checksum] = Regex.scan(~r/[\w\-]+/, cipher) |> List.flatten
 
-  defp parse(input) do
-    input
+    text
     |> String.replace(~r/[^a-z]/, "")
-    |> to_charlist
-    |> Enum.drop(-5)
-  end
-
-  defp get_most_common_letters(charlist) do
-    charlist
+    |> String.graphemes
     |> Enum.group_by(&(&1))
     |> Enum.sort_by(fn {_, list} -> list |> length end, &>=/2)
     |> Enum.take(5)
-  end
-
-  defp to_cipher(list) do
-    list
-    |> Enum.reduce([], fn ({letter, _}, acc) -> [letter | acc] end)
-    |> Enum.reverse
+    |> Enum.map(fn {char, _} -> char end)
     |> List.to_string
+    |> Kernel.==(checksum)
   end
 end
 
 defmodule Shift do
   def forward(" ", _), do: " "
-  def forward(letter = <<_::8>>, times) do
-    value = letter |> to_charlist |> hd
-    shift = rem(times, 26)
-
-    cond do
-      value + shift > 122 -> <<value + shift - 26>>
-      true -> <<value + shift>>
-    end
-  end
+  def forward(<<c::8>>, shift) when c + rem(shift,26) > 122, do: <<c + rem(shift, 26) - 26>>
+  def forward(<<c::8>>, shift), do: <<c + rem(shift, 26)>>
 end
