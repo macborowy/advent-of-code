@@ -84,7 +84,6 @@ defmodule Cipher do
   end
 end
 
-
 defmodule Shift do
   def forward(" ", _), do: " "
   def forward(letter = <<_::8>>, times) do
@@ -97,4 +96,3 @@ defmodule Shift do
     end
   end
 end
-
