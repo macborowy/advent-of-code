@@ -5,30 +5,32 @@ defmodule Signal do
   defp do_decode(input, sort_fn) do
     input
     |> parse
-    |> most_common_letter_in_columns(sort_fn)
+    |> get_message(sort_fn)
     |> to_str
   end
 
   defp parse(input), do: input |> String.trim |> String.split("\n")
   defp to_str(list), do: list |> Enum.join
 
-  defp most_common_letter_in_columns(input, sort_fn) do
-    result_length = input |> result_length
-    input |> do_most(result_length, 0, sort_fn, [])
+  defp get_message(input, sort_fn) do
+    message_length = input |> message_length
+    input |> most_common_letter_in_column(message_length, sort_fn)
   end
 
-  defp result_length(input), do: input |> Enum.at(0) |> String.length
+  defp message_length(input), do: input |> Enum.at(0) |> String.length
 
-  defp do_most(_, max, current, _, acc) when max == current, do: Enum.reverse(acc)
-  defp do_most(input, max_column, current_column, sort_fn, acc) do
-    most_common_char =
+  defp most_common_letter_in_column(input, message_length, sort_fn, current_column \\ 0, acc \\ [])
+
+  defp most_common_letter_in_column(_, max, _, current, acc) when current == max, do: Enum.reverse(acc)
+  defp most_common_letter_in_column(input, max, sort_fn, current, acc) do
+    most_common_letter =
       input
-      |> Enum.map(&String.at(&1, current_column))
+      |> Enum.map(&String.at(&1, current))
       |> Enum.group_by(&(&1))
       |> Enum.sort_by(fn {_, list} -> Enum.count(list) end, sort_fn)
       |> Enum.at(0)
       |> elem(0)
 
-    do_most(input, max_column, current_column + 1, sort_fn, [most_common_char | acc])
+    most_common_letter_in_column(input, max, sort_fn, current + 1, [most_common_letter | acc])
   end
 end
