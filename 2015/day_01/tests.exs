@@ -6,27 +6,27 @@ defmodule ModuleTest do
 
   describe "acceptance" do
     test "(()) and ()() should result 0" do
-      assert 0 == "(())" |> Exercise.solve
-      assert 0 == "()()" |> Exercise.solve
+      assert 0 == "(())" |> Exercise.delivery_floor
+      assert 0 == "()()" |> Exercise.delivery_floor
     end
 
     test "((( and (()(()( should return 3" do
-      assert 3 == "(((" |> Exercise.solve
-      assert 3 == "(()(()(" |> Exercise.solve
+      assert 3 == "(((" |> Exercise.delivery_floor
+      assert 3 == "(()(()(" |> Exercise.delivery_floor
     end
 
     test "))((((( should return 3" do
-      assert 3 == "))(((((" |> Exercise.solve
+      assert 3 == "))(((((" |> Exercise.delivery_floor
     end
 
     test "()) and ))( both result in floor -1" do
-      assert -1 == "())" |> Exercise.solve
-      assert -1 == "))(" |> Exercise.solve
+      assert -1 == "())" |> Exercise.delivery_floor
+      assert -1 == "))(" |> Exercise.delivery_floor
     end
 
     test "))) and )())()) both result in floor -3" do
-      assert -3 == ")))" |> Exercise.solve
-      assert -3 == ")())())" |> Exercise.solve
+      assert -3 == ")))" |> Exercise.delivery_floor
+      assert -3 == ")())())" |> Exercise.delivery_floor
     end
   end
 
