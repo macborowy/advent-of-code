@@ -29,4 +29,18 @@ defmodule ModuleTest do
       assert -3 == ")())())" |> Exercise.solve
     end
   end
+
+  describe "basement acceptance tests" do
+    test ") causes enter to basement at first move" do
+      assert 1 == Exercise.basement_at(")")
+    end
+
+    test "()()) causes enter basement at 5th move" do
+      assert 5 == Exercise.basement_at("()())")
+    end
+
+    test "()(()))((( causes enter basement at 7th move" do
+      assert 7 == Exercise.basement_at("()(()))(((")
+    end
+  end
 end
