@@ -16,7 +16,7 @@ defmodule Exercise do
   defp prepare(input), do: input |> String.codepoints
 
   @doc """
-  If parameter `type` is `:basement` reducer halts when it meets basement (`acc = -1`) for the first time. Otherwise, it continues to end.
+  If parameter `type` is `:basement` reducer stop when it enter basement (`acc = -1`) for the first time. Otherwise, it continues to end.
   """
   defp do_reduce(enum, type), do: enum |> Enum.reduce_while({type, 0, 0}, &reducer/2)
 
