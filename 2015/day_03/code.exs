@@ -1,12 +1,12 @@
 defmodule Delivery do
   @starting_location {0, 0}
 
-  def visit_all(instructions) when is_binary(instructions) do
-    instructions |> String.split("") |> Enum.reduce([@starting_location], &move/2)
-  end
-
   def visit_all(instructions) when is_list(instructions) do
     instructions |> Enum.reduce([@starting_location], &move/2)
+  end
+
+  def visit_all(instructions) when is_binary(instructions) do
+    instructions |> String.split("") |> visit_all
   end
 
   def visit_all(instructions, [help: :robosanta]) do
