@@ -31,9 +31,9 @@ defmodule ModuleTest do
     end
 
     test "this words are not nice (naughty)" do
+      assert {:err, "has not enough vowels"} == "dvszwmarrgswjxmb" |> Word.nice?
       assert {:err, "has no double letters"} == "jchzalrnumimnmhp" |> Word.nice?
       assert {:err, "contains disallowed string"} == "haegwjzuvuyypxyu" |> Word.nice?
-      assert {:err, "has not enough vowels"} == "dvszwmarrgswjxmb" |> Word.nice?
     end
   end
 
