@@ -1,29 +1,30 @@
 defmodule Word do
-  @vowels_reason "hasn't enough vowels (minimum 3 different)"
+  @parameter_error "parameter is not binary."
+  @vowels_error "has not enough vowels"
+  @double_letters_error "has no double letters"
 
   def nice?(word) when is_binary(word) do
-    nice? =
-      word
-      |> has_enough_vowels?
-
-    case nice? do
-      {:ok, _} -> true
-      error -> error
-    end
+    with :ok <- has_enough_vowels?(word),
+         :ok <- has_double_letters?(word),
+         do: true
   end
-  def nice?(_), do: {:err, "Parameter is not binary."}
+  def nice?(_), do: {:err, @parameter_error}
 
   defp has_enough_vowels?(word) do
-    nice? =
+    result =
       word
       |> String.replace(~r/[^aeiou]/, "")
-      |> to_charlist
-      |> Enum.group_by(&(&1))
-      |> Map.keys
-      |> length
+      |> String.length
       |> Kernel.>=(3)
 
-    if nice?, do: {:ok, word}, else: {:err, @vowels_reason}
+    if result, do: :ok, else: {:err, @vowels_error}
+  end
+
+  defp has_double_letters?(word) do
+    case String.match?(word, ~r/(\p{L})\1/) do
+      true -> :ok
+      _    -> {:err, @double_letters_error}
+    end
   end
 end
 
