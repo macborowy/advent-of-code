@@ -14,6 +14,11 @@ defmodule ModuleTest do
       {:err, reason} = "book" |> Word.nice?
       assert reason == "has not enough vowels"
     end
+
+    test "when word hasn't double letters" do
+      {:err, reason} = "diskjockey" |> Word.nice?
+      assert reason == "has no double letters"
+    end
   end
 
   describe "acceptance tests:" do
