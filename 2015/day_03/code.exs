@@ -18,7 +18,7 @@ defmodule Delivery do
   end
 
   def visit_all(_, keywords) do
-     IO.warn("Unknown keywords #{inspect(keywords)}.")
+     IO.warn("Unknown keywords #{inspect(keywords)}. Currently supported keyword is [help: :robosanta].")
      []
   end
 
@@ -31,7 +31,6 @@ defmodule Delivery do
   defp separate(instructions = [_ | rest]) do
     santa_path = instructions |> Enum.take_every(2)
     robosanta_path = rest |> Enum.take_every(2)
-
     [santa_path, robosanta_path]
   end
 end
