@@ -38,6 +38,9 @@ defmodule Word do
 end
 
 defmodule BetterWord do
+  @no_pairs_of_two_letters "has no pairs of two letters"
+  @no_repeat_letter "has no letter that repeats with exactly one letter between them"
+
   def nice?(word) do
     with :ok <- has_at_least_two_pairs_of_letters?(word),
          :ok <- has_repeat_with_single_letter_between?(word),
@@ -45,27 +48,33 @@ defmodule BetterWord do
   end
 
   def has_at_least_two_pairs_of_letters?(word) do
-     # TODO: wymyślić implementację
-
-     # It contains a pair of any two letters that appears at least twice in the string
-     # without overlapping, like xyxy (xy) or aabcdefgaa (aa),
-     # but not like aaa (aa, but it overlaps).
+    case word |> String.match?(~r/(.{2}).*\1/) do
+      true -> :ok
+      _    -> {:err, @no_pairs_of_two_letters}
+    end
   end
 
   def has_repeat_with_single_letter_between?(word) do
-    # TODO: wymyślić implementację
-
-    # It contains at least one letter which repeats with exactly
-    # one letter between them, like xyx, abcdefeghi (efe), or even aaa.
+    case word |> String.match?(~r/(.).\1/) do
+      true -> :ok
+      _    -> {:err, @no_repeat_letter}
+    end
   end
 end
 
-if System.argv == ["--run"] do
+test_input = fn func ->
   "input.txt"
   |> File.read!
   |> String.split("\n", trim: true)
-  |> Enum.map(&Word.nice?/1)
+  |> Enum.map(&func.(&1))
   |> Enum.filter(&(&1==true))
   |> Enum.count
-  |> IO.puts
+end
+
+if System.argv == ["--run"] do
+  part_1 = test_input.(&Word.nice?/1)
+  part_2 = test_input.(&BetterWord.nice?/1)
+
+  IO.puts "Number of nice string for part 1 rules: #{part_1}"
+  IO.puts "Number of nice string for part 1 rules: #{part_2}"
 end

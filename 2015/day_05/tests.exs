@@ -77,11 +77,11 @@ defmodule BetterWordTest do
     end
 
     test "uurcxstgmygtbstg isn't a nice string, because it hasn't letter that repeats with exactly one letter between them" do
-      assert "uurcxstgmygtbstg" |> BetterWord.nice?
+      assert "has no letter that repeats with exactly one letter between them" == "uurcxstgmygtbstg" |> BetterWord.nice? |> elem(1)
     end
 
     test "ieodomkazucvgmuy isn't a nice string, because it hasn't pair of letters that appears twice" do
-      assert "ieodomkazucvgmuy" |> BetterWord.nice?
+      assert "has no pairs of two letters" == "ieodomkazucvgmuy" |> BetterWord.nice? |> elem(1)
     end
   end
 end
