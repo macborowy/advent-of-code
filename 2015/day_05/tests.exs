@@ -2,7 +2,7 @@ Code.load_file("code.exs")
 ExUnit.start
 ExUnit.configure trace: true
 
-defmodule ModuleTest do
+defmodule WordTest do
   use ExUnit.Case
 
   describe "error messages" do
@@ -60,6 +60,28 @@ defmodule ModuleTest do
 
     test "word aei is not nice, because it doesn't contains any two letters in a row" do
       assert :err == "aei" |> Word.nice? |> elem(0)
+    end
+  end
+end
+
+defmodule BetterWordTest do
+  use ExUnit.Case
+
+  describe "accceptance tests" do
+    test "qjhvhtzxzqqjkmpb is a nice string" do
+      assert "qjhvhtzxzqqjkmpb" |> BetterWord.nice?
+    end
+
+    test "xxyxx is a nice string" do
+      assert "xxyxx" |> BetterWord.nice?
+    end
+
+    test "uurcxstgmygtbstg isn't a nice string, because it hasn't letter that repeats with exactly one letter between them" do
+      assert "uurcxstgmygtbstg" |> BetterWord.nice?
+    end
+
+    test "ieodomkazucvgmuy isn't a nice string, because it hasn't pair of letters that appears twice" do
+      assert "ieodomkazucvgmuy" |> BetterWord.nice?
     end
   end
 end
