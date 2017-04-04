@@ -7,10 +7,7 @@ defmodule Word do
   end
 
   defp has_enough_vowels?(word) do
-    word
-    |> String.replace(~r/[^aeiou]/, "")
-    |> String.length
-    |> Kernel.>=(3)
+    word |> String.replace(~r/[^aeiou]/, "") |> String.length |> Kernel.>=(3)
   end
 
   defp has_double_letters?(word), do: String.match?(word, ~r/(\p{L})\1/)
@@ -22,7 +19,7 @@ defmodule BetterWord do
   def nice?(word) when is_binary(word) do
     with true <- word |> has_at_least_two_pairs_of_letters?,
          true <- word |> has_repeat_with_single_letter_between?,
-    do: true
+         do: true
   end
 
   defp has_at_least_two_pairs_of_letters?(word), do: String.match?(word, ~r/(.{2}).*\1/)
