@@ -22,32 +22,3 @@ defmodule Command do
 
   defp to_int(string), do: String.to_integer(string)
 end
-
-defmodule Decoration do
-  def new, do: for x <- 0..999, y <- 0..999, do: {:turn_off, x, y}
-
-  def change(decoration_grid, command) do
-    %Command{action: action, start_at: {start_x, start_y}, finish_at: {finish_x, finish_y}} = Command.parse(command)
-
-    for light = {_, x, y} <- decoration_grid,
-        do: if x in start_x..finish_x && y in start_y..finish_y,
-            do: do_change(light, action),
-            else: light
-  end
-
-  defp do_change({_,         x, y}, :turn_on),  do: {:turn_on,  x, y}
-  defp do_change({_,         x, y}, :turn_off), do: {:turn_off, x, y}
-  defp do_change({:turn_on,  x, y}, :toggle),   do: {:turn_off, x, y}
-  defp do_change({:turn_off, x, y}, :toggle),   do: {:turn_on,  x, y}
-end
-
-if System.argv == ["--run"] do
-  "input.txt"
-  |> File.read!
-  |> String.trim
-  |> String.split("\n", trim: true)
-  # |> Enum.take(5)
-  |> Enum.reduce(Decoration.new, fn command, decoration -> Decoration.change(decoration, command) end)
-  |> Enum.count(&(:turn_on == &1 |> elem(0)))
-  |> IO.puts
-end
