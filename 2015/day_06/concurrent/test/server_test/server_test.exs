@@ -19,12 +19,13 @@ defmodule ServerTest do
 
   describe "process" do
     test "return grid after applying all commands", %{pid: pid, path_to_file: path} do
-      result = Server.process(pid, path)
-
-      assert 1000 == result |> length
-      assert 1000 == result |> Enum.at(0) |> length
-      assert result |> Enum.all?(&(&1 |> is_list))
-      assert result |> Enum.at(0) |> Enum.all?(&(&1 |> is_atom))
+      # result = Server.process(pid, path)
+      #
+      # assert 1000 == result |> length
+      # assert 1000 == result |> Enum.at(0) |> length
+      # assert result |> Enum.all?(&(&1 |> is_list))
+      # assert result |> Enum.at(0) |> Enum.all?(&(&1 |> is_atom))
+      flunk "Expected error occured: uncomment this test when worker implementation be ready"
     end
   end
 end

@@ -8,8 +8,8 @@ defmodule Server do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def process(pid, path_to_file) do
-    GenServer.call(pid, {:process, path_to_file})
+  def process(path_to_file) do
+    GenServer.call(__MODULE__, {:process, path_to_file})
   end
 
   # Server API
