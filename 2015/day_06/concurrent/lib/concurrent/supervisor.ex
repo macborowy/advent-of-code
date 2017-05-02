@@ -6,7 +6,10 @@ defmodule Concurrent.Supervisor do
   end
 
   def init([]) do
-    children = [worker(Concurrent.Server, [])]
+    children = [
+      worker(Concurrent.Server, []),
+      worker(Concurrent.WorkerServer, [])
+    ]
     options = [strategy: :one_for_one]
 
     supervise(children, options)
