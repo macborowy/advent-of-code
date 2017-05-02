@@ -18,10 +18,11 @@ defmodule Concurrent.Server do
   #############
 
   def init([]) do
-    {:ok, nil}
+    {:ok, Concurrent.Grid.new()}
   end
 
   def handle_call({:run, path}, _from, state) do
+
      {:reply, :ok, state}
   end
 end
