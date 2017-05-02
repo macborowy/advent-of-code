@@ -10,7 +10,7 @@ defmodule Concurrent.Server do
   end
 
   def run(path) do
-    GenServer.call(__MODULE__, {:run, path})
+    GenServer.call(__MODULE__, {:run, path}, :infinity)
   end
 
   #############
@@ -22,7 +22,48 @@ defmodule Concurrent.Server do
   end
 
   def handle_call({:run, path}, _from, state) do
+    turned_on =
+      path
+      |> Concurrent.Parser.get_commands
+      |> Enum.reduce(Concurrent.Grid.new, &process_command_with_timer/2)
+      |> count_turned_on(0)
 
-     {:reply, :ok, state}
+    {:reply, turned_on, state}
+  end
+
+  #####################
+  # Private functions #
+  #####################
+
+  defp process_command_with_timer(command, grid) do
+    IO.puts "Start processing command: #{inspect command}"
+
+    {time, value} = :timer.tc(fn -> process_command(command, grid) end)
+
+    IO.puts "Time taken to process command: #{time / 1000}"
+    value
+  end
+
+  defp process_command(%Concurrent.Command{action: action, x: x, y: y, width: width, height: height}, grid) do
+    {head, rest} = grid |> Enum.split(y)
+    {to_change, tail} = rest |> Enum.split(height)
+
+    result =
+      to_change
+      |> Enum.with_index
+      |> Enum.map(fn {row, index} ->
+        Task.Supervisor.async(Concurrent.TasksSupervisor, Concurrent.Worker, :process, [row, action, x, width, index])
+      end)
+      |> Enum.map(&Task.await(&1, :infinity))
+      |> Enum.sort(fn ({_, idx_1}, {_, idx_2}) -> idx_1 < idx_2 end)
+      |> Enum.map(fn {row, _} -> row end)
+
+    head ++ result ++ tail
+  end
+
+  defp count_turned_on([], acc), do: acc
+  defp count_turned_on([row | rest], acc) do
+    count = row |> Enum.count(fn elem -> elem == :turn_on end)
+    count_turned_on(rest, acc + count)
   end
 end
