@@ -10,7 +10,8 @@ defmodule Concurrent.Command do
   end
 
   defp to_command([action, from_x, from_y, end_x, end_y]) do
-    # TODO: possible problems with to_atom
+    # TODO: possible problems with String.to_atom - should use String.to_existing_atom,
+    #       but it breaks tests (weird...)
     %Concurrent.Command{
       action: action |> String.replace(" ", "_") |> String.to_atom,
       x: to_int(from_x),

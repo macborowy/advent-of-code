@@ -22,32 +22,18 @@ defmodule Concurrent.Server do
   end
 
   def handle_call({:run, path}, _from, state) do
-
-    process_all_commands = fn path ->
+    result =
       path
-      |> Concurrent.Parser.get_commands
-      |> Enum.reduce(Concurrent.Grid.new, &process_command_with_timer/2)
+      |> Concurrent.Parser.get_commands_from_file
+      |> Enum.reduce(Concurrent.Grid.new, &process_command/2)
       |> total_brightness
-    end
 
-    {time, value} = :timer.tc(fn -> process_all_commands.(path) end)
-    IO.puts "Time to process all commands: #{time / 1_000_000}"
-
-    {:reply, value, state}
+    {:reply, result, state}
   end
 
   #####################
   # Private functions #
   #####################
-
-  defp process_command_with_timer(command, grid) do
-    IO.puts "Start processing command: #{inspect command}"
-
-    {time, value} = :timer.tc(fn -> process_command(command, grid) end)
-
-    IO.puts "Time taken to process command: #{time / 1_000_000}"
-    value
-  end
 
   defp process_command(%Concurrent.Command{action: action, x: x, y: y, width: width, height: height}, grid) do
     {head, to_change, tail} = Concurrent.Grid.split_rows(grid, y, height)

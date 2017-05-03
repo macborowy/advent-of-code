@@ -1,5 +1,5 @@
 defmodule Concurrent.Parser do
-  def get_commands(path) do
+  def get_commands_from_file(path) do
     path
     |> parse
     |> to_commands
