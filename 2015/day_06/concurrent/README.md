@@ -6,7 +6,7 @@ This exercise was my first case ever, where I **have to use** GenServers (exclud
 
 I don't like how `lib/concurrent` directory looks - it feels a bit "mixed". It contains modules responsible for the application mechanic (Supervisor, Server, Worker) and "helper" modules. I don't imagine yet, how and where to place project files well.
 
-Additionally, I don't know which parts of application require a significant testing. I also feel like I broke SRP and made Server has too much logic/responsibilities. This problem will be probably touched when I finish the second part of the exercise.
+Additionally, I don't know which parts of application require a significant testing. I also feel like I broke SRP and made Server has too much logic/responsibilities 💪. This problem will be probably touched when I finish the second part of the exercise.
 
 ## Performance
 Performance outstands my expectation. It is roughly 2000 times faster than brute force approach. It takes ~6 seconds to return a result (when I was testing the brute force approach it takes 6 seconds to process first command and each next command was longer).
