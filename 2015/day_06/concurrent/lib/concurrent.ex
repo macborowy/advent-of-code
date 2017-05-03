@@ -6,7 +6,7 @@ defmodule Concurrent do
   end
 
   def run(input) do
-     result = Concurrent.Server.run(input)
-     IO.puts result
+    {time, value} = :timer.tc(fn -> Concurrent.Server.run(input) end)
+    IO.puts "The result is: #{value}. Time to complete: #{Float.round(time / 1_000_000, 2)} second(s)."
   end
 end
