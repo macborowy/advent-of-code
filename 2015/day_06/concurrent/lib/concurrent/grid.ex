@@ -1,5 +1,5 @@
 defmodule Concurrent.Grid do
-  def new(default \\ :turn_off) do
+  def new(default \\ 0) do
     1..1_000
     |> Enum.map(fn _ ->
       1..1000

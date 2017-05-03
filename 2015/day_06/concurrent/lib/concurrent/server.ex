@@ -27,7 +27,7 @@ defmodule Concurrent.Server do
       path
       |> Concurrent.Parser.get_commands
       |> Enum.reduce(Concurrent.Grid.new, &process_command_with_timer/2)
-      |> count_turned_on(0)
+      |> total_brightness
     end
 
     {time, value} = :timer.tc(fn -> process_all_commands.(path) end)
@@ -65,9 +65,5 @@ defmodule Concurrent.Server do
     head ++ result ++ tail
   end
 
-  defp count_turned_on([], acc), do: acc
-  defp count_turned_on([row | rest], acc) do
-    count = row |> Enum.count(fn elem -> elem == :turn_on end)
-    count_turned_on(rest, acc + count)
-  end
+  defp total_brightness(grid), do: grid |> Enum.reduce(0, &(&2 + Enum.sum(&1)))
 end
