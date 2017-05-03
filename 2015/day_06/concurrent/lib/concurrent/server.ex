@@ -22,13 +22,18 @@ defmodule Concurrent.Server do
   end
 
   def handle_call({:run, path}, _from, state) do
-    turned_on =
+
+    process_all_commands = fn path ->
       path
       |> Concurrent.Parser.get_commands
       |> Enum.reduce(Concurrent.Grid.new, &process_command_with_timer/2)
       |> count_turned_on(0)
+    end
 
-    {:reply, turned_on, state}
+    {time, value} = :timer.tc(fn -> process_all_commands.(path) end)
+    IO.puts "Time to process all commands: #{time / 1_000_000}"
+
+    {:reply, value, state}
   end
 
   #####################
@@ -40,7 +45,7 @@ defmodule Concurrent.Server do
 
     {time, value} = :timer.tc(fn -> process_command(command, grid) end)
 
-    IO.puts "Time taken to process command: #{time / 1000}"
+    IO.puts "Time taken to process command: #{time / 1_000_000}"
     value
   end
 
