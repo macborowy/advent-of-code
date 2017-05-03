@@ -4,5 +4,5 @@ This repository contains my answers to *Advent Of Code* (both [2015](http://adve
 
 ## Solutions I'm proud of
 
-1. 2015
-  - (day 6 - concurrent version)[https://github.com/macborowy/advent-of-code/tree/master/2015/day_06/concurrent]
+### Adevent Of Code 2015
+  - [day 6 - concurrent version](https://github.com/macborowy/advent-of-code/tree/master/2015/day_06/concurrent)
