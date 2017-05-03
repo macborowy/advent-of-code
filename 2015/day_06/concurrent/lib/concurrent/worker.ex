@@ -1,8 +1,7 @@
 defmodule Concurrent.Worker do
   @spec process([atom], atom, number, number, number) :: [atom]
-  def process(list, state, from, length, index) do    
-    {head, rest} = list |> Enum.split(from)
-    {to_change, tail} = rest |> Enum.split(length)
+  def process(row, state, from, length, index) do
+    {head, to_change, tail} = Concurrent.Grid.split_columns(row, from, length)
 
     {head ++ change(to_change, state) ++ tail, index}
   end

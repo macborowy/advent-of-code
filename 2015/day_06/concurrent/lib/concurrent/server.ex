@@ -50,8 +50,7 @@ defmodule Concurrent.Server do
   end
 
   defp process_command(%Concurrent.Command{action: action, x: x, y: y, width: width, height: height}, grid) do
-    {head, rest} = grid |> Enum.split(y)
-    {to_change, tail} = rest |> Enum.split(height)
+    {head, to_change, tail} = Concurrent.Grid.split_rows(grid, y, height)
 
     result =
       to_change
