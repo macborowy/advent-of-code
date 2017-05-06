@@ -5,7 +5,7 @@ defmodule InstructionTest do
   describe "new/1" do
     test "should return gate as atom" do
       input = "af AND ah -> ai"
-      %{gate: gate} = Instruction.new(input)
+      %{gate: gate} = Gates.Instruction.new(input)
       assert is_atom(gate)
     end
   end
