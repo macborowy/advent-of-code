@@ -56,13 +56,8 @@ defmodule Script do
   end
 
   def solve(instructions, known_wires, iter \\ 1)
-  # def solve(_, known_wires, 100), do: known_wires
   def solve([], known_wires, _iter), do: known_wires
   def solve(instructions, [], iter) do
-    debug_info(instructions, [], iter)
-
-    instructions |> Enum.take(10) |> IO.inspect
-
     instructions_to_solve = instructions |> select_signals
 
     new_known_wires = instructions_to_solve |> calculate([]) |> merge_known_wires([])
@@ -71,8 +66,6 @@ defmodule Script do
     solve(reduced_instructions, new_known_wires, iter + 1)
   end
   def solve(instructions, known_wires, iter) do
-    debug_info(instructions, known_wires, iter)
-
     instructions_to_solve = known_wires |> create_all_inputs_to_check |> select_instructions(instructions)
 
     new_known_wires = instructions_to_solve |> calculate(known_wires) |> merge_known_wires(known_wires)
