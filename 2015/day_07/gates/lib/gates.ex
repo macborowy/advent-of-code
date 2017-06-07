@@ -4,10 +4,9 @@ defmodule Gates do
   """
 
   def run do
-    Gates.Server.start_link
+    {:ok, pid} = Gates.Server.start_link
 
-    "input.txt"
-    |> Gates.Server.process
+    Gates.Server.process(pid, "input.txt")
     |> Enum.find(fn {wire, _} -> wire == "a" end)
   end
 end

@@ -12,11 +12,11 @@ defmodule Gates.Server do
   ##############
 
   def start_link do
-    GenServer.start_link(__MODULE__, [], [name: __MODULE__])
+    GenServer.start_link(__MODULE__, [])
   end
 
-  def process(file_path) do
-    GenServer.call(__MODULE__, {:process, file_path})
+  def process(pid, file_path) do
+    GenServer.call(pid, {:process, file_path})
   end
 
   #############
