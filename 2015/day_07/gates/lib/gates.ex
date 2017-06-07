@@ -3,16 +3,11 @@ defmodule Gates do
   Documentation for Gates.
   """
 
-  @doc """
-  Hello world.
+  def run do
+    Gates.Server.start_link
 
-  ## Examples
-
-      iex> Gates.hello
-      :world
-
-  """
-  def hello do
-    :world
+    "input.txt"
+    |> Gates.Server.process
+    |> Enum.find(fn {wire, _} -> wire == "a" end)
   end
 end

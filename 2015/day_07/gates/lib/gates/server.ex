@@ -2,7 +2,9 @@ defmodule Gates.Server do
   use GenServer
 
   defmodule State do
-    defstruct [instructions: nil, known_wires: nil, current_state: nil]
+    defstruct [instructions: nil, known_wires: nil, recently_solved: nil, client: nil]
+
+    def new, do: %__MODULE__{}
   end
 
   ##############
@@ -14,7 +16,7 @@ defmodule Gates.Server do
   end
 
   def process(file_path) do
-    GenServer.call(__MODULE__, {:process, file_path}, :infinity)
+    GenServer.call(__MODULE__, {:process, file_path})
   end
 
   #############
@@ -22,20 +24,50 @@ defmodule Gates.Server do
   #############
 
   def init([]) do
-    {:ok, %State{instructions: [], known_wires: [], current_state: :idle}}
+    {:ok, State.new()}
   end
 
-  def handle_call({:process, file_path}, _from, state) do
+  def handle_call({:process, file_path}, from, state) do
     instructions = file_path |> read_instructions
 
-    signals = Gates.Finder.find(instructions, :signals)
+    send(self(), :find_signals)
+    {:noreply, %State{state | instructions: instructions, client: from}}
+  end
 
-    new_wires = signals |> Enum.map(&Gates.Processor.process(&1, []))
-    instructions_without_signals = instructions |> remove_solved(signals)
+  def handle_info(:find_signals, %{instructions: instructions} = state) do
+    signal_instructions = Gates.Finder.find(instructions, :signals)
+    signals = signal_instructions |> Enum.map(&Gates.Processor.process(&1, []))
 
-    result = do_process(instructions_without_signals, new_wires)
+    new_state = %State{
+      state |
+      instructions: instructions |> remove_solved(signal_instructions),
+      recently_solved: signals,
+      known_wires: []
+    }
 
-    {:reply, result, state}
+    send(self(), :find_wires)
+    {:noreply, new_state}
+  end
+
+  def handle_info(:find_wires, %{instructions: [], known_wires: known_wires, recently_solved: recently_solved, client: client} = state) do
+    reply = recently_solved ++ known_wires
+
+    GenServer.reply(client, reply)
+    {:noreply, %State{state | recently_solved: [], known_wires: reply}}
+  end
+
+  def handle_info(:find_wires, %{instructions: instructions, known_wires: known_wires, recently_solved: recently_solved} = state) do
+    {recently_solved, new_instructions, new_known_wires} = do_process(instructions, recently_solved, known_wires)
+
+    new_state = %State{
+      state |
+      instructions: new_instructions,
+      recently_solved: recently_solved,
+      known_wires: new_known_wires
+    }
+
+    send(self(), :find_wires)
+    {:noreply, new_state}
   end
 
   #####################
@@ -56,8 +88,6 @@ defmodule Gates.Server do
 
   # recently_solved contain list of wires resolved in previous do_process execution
   # the idea was to prevent do_process/3 from checking always growing list of known_wires each time
-  defp do_process(instructions, recently_solved, known_wires \\ [])
-  defp do_process([], recenlty_solved, known_wires), do: known_wires ++ recenlty_solved
   defp do_process(instructions, recently_solved, known_wires) do
     known_wires = recently_solved ++ known_wires
 
@@ -74,6 +104,6 @@ defmodule Gates.Server do
 
     instructions = instructions |> remove_solved(instructions_to_solve)
 
-    do_process(instructions, new_wires, known_wires)
+    {new_wires, instructions, known_wires}
   end
 end
