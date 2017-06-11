@@ -11,27 +11,28 @@ defmodule Gates.Server do
   # Client API #
   ##############
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [])
+  def start_link(file_path) do
+    GenServer.start_link(__MODULE__, file_path)
   end
 
-  def process(pid, file_path) do
-    GenServer.call(pid, {:process, file_path})
+  def process(pid) do
+    GenServer.call(pid, :process)
   end
 
   #############
   # Callbacks #
   #############
 
-  def init([]) do
-    {:ok, State.new()}
+  def init(file_path) do
+    new_state = State.new()
+    instructions = file_path |> Gates.Parser.get_instructions
+
+    {:ok, %State{new_state | instructions: instructions}}
   end
 
-  def handle_call({:process, file_path}, from, state) do
-    instructions = file_path |> read_instructions
-
+  def handle_call(:process, from, state) do
     send(self(), :find_signals)
-    {:noreply, %State{state | instructions: instructions, client: from}}
+    {:noreply, %State{state | client: from}}
   end
 
   def handle_info(:find_signals, %{instructions: instructions} = state) do
@@ -73,14 +74,6 @@ defmodule Gates.Server do
   #####################
   # Private Functions #
   #####################
-
-  defp read_instructions(file_path) do
-    file_path
-    |> File.read!
-    |> String.trim
-    |> String.split("\n")
-    |> Enum.map(&Gates.Instruction.new/1)
-  end
 
   defp remove_solved(instructions, solved) do
     instructions -- solved
