@@ -2,32 +2,24 @@ defmodule Gates.Server do
   use GenServer
 
   defmodule State do
-    defstruct [instructions: nil, known_wires: nil, recently_solved: nil, client: nil]
-
-    def new, do: %__MODULE__{}
+    defstruct instructions: nil, known_wires: nil, recently_solved: nil, client: nil
   end
 
   ##############
   # Client API #
   ##############
 
-  def start_link(file_path) do
-    GenServer.start_link(__MODULE__, file_path)
-  end
+  def start_link(file_path), do: GenServer.start_link(__MODULE__, file_path)
 
-  def process(pid) do
-    GenServer.call(pid, :process)
-  end
+  def process(pid), do: GenServer.call(pid, :process)
 
   #############
   # Callbacks #
   #############
 
   def init(file_path) do
-    new_state = State.new()
     instructions = file_path |> Gates.Parser.get_instructions
-
-    {:ok, %State{new_state | instructions: instructions}}
+    {:ok, %State{instructions: instructions}}
   end
 
   def handle_call(:process, from, state) do
