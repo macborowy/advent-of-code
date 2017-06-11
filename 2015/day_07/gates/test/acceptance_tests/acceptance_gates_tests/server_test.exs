@@ -15,9 +15,9 @@ defmodule Acceptance.Gates.ServerTests do
       assert instructions |> is_list
     end
 
-    test "after process initialization known_wires, recently_solved and client values are nil", %{server_pid: pid} do
+    test "after process initialization known_wires are empty list, recently_solved and client values are nil", %{server_pid: pid} do
       state = :sys.get_state(pid)
-      assert state.known_wires == nil
+      assert state.known_wires == []
       assert state.recently_solved == nil
       assert state.client == nil
     end

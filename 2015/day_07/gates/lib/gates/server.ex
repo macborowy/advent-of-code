@@ -17,7 +17,8 @@ defmodule Gates.Server do
   @doc """
   Starts the Server process. The `file_path` is the path to input file.
   """
-  def start_link(file_path), do: GenServer.start_link(__MODULE__, file_path)
+  def start_link(file_path, predefined_values \\ []),
+    do: GenServer.start_link(__MODULE__, [file_path, predefined_values])
 
   @doc """
   Processes instructions in the state.
@@ -28,9 +29,18 @@ defmodule Gates.Server do
   # Callbacks #
   #############
 
-  def init(file_path) do
+  def init([file_path, []]) do
     instructions = file_path |> Gates.Parser.get_instructions
-    {:ok, %State{instructions: instructions}}
+    {:ok, %State{instructions: instructions, known_wires: []}}
+  end
+
+  def init([file_path, predefined_values]) do
+    instructions =
+      file_path
+      |> Gates.Parser.get_instructions
+      |> reject_signal_instructions_for(predefined_values)
+
+    {:ok, %State{instructions: instructions, known_wires: predefined_values}}
   end
 
   def handle_call(:process, from, state) do
@@ -44,8 +54,7 @@ defmodule Gates.Server do
     new_state = %State{
       state |
       instructions: reduced_instructions,
-      recently_solved: signals,
-      known_wires: []
+      recently_solved: signals ++ state.known_wires
     }
 
     send(self(), :find_wires)
@@ -74,6 +83,13 @@ defmodule Gates.Server do
   #####################
   # Private Functions #
   #####################
+
+  defp reject_signal_instructions_for(instructions, to_reject) do
+    wires_to_reject = to_reject |> Enum.map(fn {wire, _} -> wire end)
+
+    instructions
+    |> Enum.reject(fn %{output: wire} ->  wire in wires_to_reject end)
+  end
 
   defp get_signals(instructions) do
     signal_instructions = Gates.Finder.find(instructions, :signals)
