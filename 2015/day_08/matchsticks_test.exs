@@ -1,6 +1,8 @@
+Code.load_file("matchsticks.ex")
+ExUnit.start
+
 defmodule MatchsticksTest do
   use ExUnit.Case
-  doctest Matchsticks
 
   setup do
     strings = "input.txt" |> File.read! |> String.split("\n")
